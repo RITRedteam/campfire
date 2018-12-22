@@ -1,3 +1,7 @@
+// This go file will collect the host's firewall rules ship them back
+// to a defined webserver, along with the hostname
+// disclaimer: this doesn't work yet
+// @author: degenerat3
 package main
 
 import "os/exec"
