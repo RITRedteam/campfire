@@ -1,6 +1,6 @@
 // This go file will collect the host's firewall rules ship them back
 // to a defined webserver, along with the hostname
-// disclaimer: this doesn't work yet
+// disclaimer: this barely works
 // @author: degenerat3
 package main
 
@@ -12,9 +12,11 @@ import "io/ioutil"
 import "bytes"
 import "encoding/json"
 import "strings"
+import "time"
+import "os"
 
- var serv = "127.0.0.1:5000/api/rule_send"
-// var loop_time = 30
+var serv = "127.0.0.1:5000/api/rule_send"
+var loop_time = 60		//sleep time in seconds
 
 func get_tables() string{
 	cmd := exec.Command("iptables", "-L")
@@ -56,8 +58,23 @@ func send_data(rules string, host string){
 	}
 }
 
-func main(){
+func run(){
 	rules := get_tables()
 	host := get_hn()
 	send_data(rules, host)
 }
+
+func main(){
+	loop_arg := os.Args[1]
+	if loop_arg == "-s"{
+		run()
+	} else{
+		for {
+			run()
+			t := time.Duration(loop_time*1000)
+			time.Sleep(t * time.Millisecond)
+		}
+	}
+}
+
+
