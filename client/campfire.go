@@ -11,6 +11,7 @@ import "net/http"
 import "io/ioutil"
 import "bytes"
 import "encoding/json"
+import "strings"
 
  var serv = "127.0.0.1:5000/api/rule_send"
 // var loop_time = 30
@@ -32,7 +33,9 @@ func get_hn() string{
         log.Fatalf("cmd.Run() failed with %s\n", err)
         return "Err"
     }
-    return string(out)
+	o1 := string(out)
+	o2 := strings.TrimSuffix(o1, "\n")
+    return o2
 
 }
 
