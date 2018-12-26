@@ -10,8 +10,9 @@ import "log"
 import "net/http"
 import "io/ioutil"
 import "bytes"
+import "encoding/json"
 
-var serv = "127.0.0.1:5000/api/rule_send"
+ var serv = "127.0.0.1:5000/api/rule_send"
 // var loop_time = 30
 
 func get_tables() string{
@@ -25,7 +26,7 @@ func get_tables() string{
 }
 
 func get_hn() string{
-	cmd := exec.Command("whoami")
+	cmd := exec.Command("hostname")
     out, err := cmd.CombinedOutput()
     if err != nil {
         log.Fatalf("cmd.Run() failed with %s\n", err)
@@ -36,28 +37,20 @@ func get_hn() string{
 }
 
 func send_data(rules string, host string){
-	fmt.Printf("%s", host);
-	fmt.Printf("%s", rules);
-	url := serv;
-
+	url1 := "http://" + serv;
+	fmt.Printf("url: %s\n", url1)
 	bigStr := fmt.Sprintf("%s%s%s%s%s", "{\"hostname\":\"", host, "\", \"rules\":\"", rules, "\"}");
 	fmt.Println("%s", bigStr);
 
-    var jsonStr = []byte(bigStr);
-    req, err := http.NewRequest("POST", url, bytes.NewBuffer(jsonStr));
-    req.Header.Set("Content-Type", "application/json");
-
-    client := &http.Client{};
-    resp, err := client.Do(req);
-    if err != nil {
-        panic(err);
-    }
-    defer resp.Body.Close();
-
-    fmt.Println("response Status:", resp.Status)
-    fmt.Println("response Headers:", resp.Header)
-    body, _ := ioutil.ReadAll(resp.Body)
-    fmt.Println("response Body:", string(body))
+    jsonData := map[string]string{"hostname": host, "rules": rules}
+	jsonValue, _ := json.Marshal(jsonData)
+	resp, err := http.Post(url1, "application/json", bytes.NewBuffer(jsonValue))
+	if err != nil {
+		fmt.Printf("Req failed: %s\n", err)
+	} else{
+		data, _ := ioutil.ReadAll(resp.Body)
+		fmt.Println(string(data))
+	}
 }
 
 func main(){
