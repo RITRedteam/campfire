@@ -22,8 +22,7 @@ once the build is finished, it can be run with the following:
 The flask server is now accessible via port 5000  
 
 ###### Navigation
-Once the server is running, the hosts will be able to send their post requests to "_IP_:5000/api/rule_send" which can then be viewed by going to the associated host URL.  For hostname "test1" the url would be ""_IP_:5000/api/hosts/test1"  
+Once the server is running, the hosts will be able to send their post requests to "_IP_:5000/api/rule_send" which can then be viewed by going to the associated host URL.  For hostname "test1" the url would be ""_IP_:5000/api/hosts/test1" or users can navigate to "_IP_:5000/hosts/" and they will have a list of all tracked targets.  
 
 #### TODO
-* Implement a "/hosts/" splash page to display/access all tracked targets  
 * Write a script to query API so we can get a host's rules without navigating through the web browser   
