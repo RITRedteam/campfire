@@ -76,7 +76,12 @@ def view_hosts():
 	if not os.path.exists("/tmp/host_list.txt"):
 		return "No tracked hosts..."
 	with open("/tmp/host_list.txt", "r") as f:
-		lst = f.readlines()
+		lst1 = f.readlines()
+		lst = []
+		for item in lst1:
+			if item not in lst:
+				lst.append(item)
+		lst = sorted(lst)
 		s = "<b>Tracked Targets: </b> <br />"
 		for h in lst:
 			host = h.strip("\n")
