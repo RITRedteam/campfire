@@ -24,11 +24,11 @@ def get_rules():
 	hostname = content['hostname']
 	hostname = hostname.lower()
 	rules = content['rules']
-	if not os.path.isfile("host_list.txt"):
-		with open("host_list.txt", "w+") as f:
+	if not os.path.isfile("/tmp/host_list.txt"):
+		with open("/tmp/host_list.txt", "w+") as f:
 			f.write(hostname + "\n")
 	else:
-		with open("host_list.txt", "a") as f:
+		with open("/tmp/host_list.txt", "a") as f:
 			f.write(hostname + "\n")
 	if not os.path.exists("/tmp/flask_files"):
 		os.makedirs("/tmp/flask_files")		#make dir in /tmp	
@@ -67,6 +67,22 @@ def view_rules(host):
 	return fin					#return html block
 
 
+@app.route('/hosts/')
+def view_hosts():
+	if not os.path.exists("/tmp/host_list.txt"):
+		return "No tracked hosts..."
+	with open("/tmp/host_list.txt", "r") as f:
+		lst = f.readlines()
+		s = ""
+		for h in lst:
+			host = h.strip("\n")
+			tmp = "<a href=\"/api/hosts/$\">$</a> <br />"
+			tmp = tmp.replace("$", host)
+			s += tmp
+	return str(s)
+
+
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0')
+
 
