@@ -24,6 +24,12 @@ def get_rules():
 	hostname = content['hostname']
 	hostname = hostname.lower()
 	rules = content['rules']
+	if not os.path.isfile("host_list.txt"):
+		with open("host_list.txt", "w+") as f:
+			f.write(hostname + "\n")
+	else:
+		with open("host_list.txt", "a") as f:
+			f.write(hostname + "\n")
 	if not os.path.exists("/tmp/flask_files"):
 		os.makedirs("/tmp/flask_files")		#make dir in /tmp	
 	dir_str = "/tmp/flask_files/" + hostname + ".txt"
