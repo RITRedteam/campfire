@@ -73,7 +73,7 @@ def view_hosts():
 		return "No tracked hosts..."
 	with open("/tmp/host_list.txt", "r") as f:
 		lst = f.readlines()
-		s = ""
+		s = "<b>Tracked Targets: </b> <br />"
 		for h in lst:
 			host = h.strip("\n")
 			tmp = "<a href=\"/api/hosts/$\">$</a> <br />"
