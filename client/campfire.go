@@ -15,7 +15,7 @@ import "strings"
 import "time"
 import "os"
 
-var serv = "127.0.0.1:5000/api/rule_send"	//IP of flask serv
+var serv = "127.0.0.1:5000"	//IP of flask serv
 var loop_time = 60		//sleep time in seconds
 
 
@@ -48,7 +48,7 @@ func get_hn() string{
 
 // post strings to flask server
 func send_data(rules string, host string){
-	url1 := "http://" + serv;	// turn ip into valid url
+	url1 := "http://" + serv + "/api/rule_send"	// turn ip into valid url
     jsonData := map[string]string{"hostname": host, "rules": rules}
 	jsonValue, _ := json.Marshal(jsonData)
 	resp, err := http.Post(url1, "application/json", bytes.NewBuffer(jsonValue))
