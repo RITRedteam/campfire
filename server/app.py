@@ -67,6 +67,10 @@ def view_rules(host):
 	return fin					#return html block
 
 
+"""
+This function displays all tracked hosts with links
+to their unique URLs
+"""
 @app.route('/hosts/')
 def view_hosts():
 	if not os.path.exists("/tmp/host_list.txt"):
