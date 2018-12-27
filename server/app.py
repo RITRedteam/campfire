@@ -2,7 +2,7 @@
 This file will be run as the app for a flask server, it's responsible
 for recieving/parsing POST'd firewall rules from hosts and writing 
 them to files
-disclaimer: this doesn't work yet
+disclaimer: this barely works
 @author: degenerat3
 """
 from flask import Flask, request
@@ -11,6 +11,12 @@ import datetime
 
 app = Flask(__name__)
 
+
+"""
+This function will recieve the hostnames/rules as a POST request 
+and write the data to a file with the timestamp of when the data 
+was recieved.
+"""
 @app.route('/api/rule_send', methods=['GET','POST'])
 def get_rules():
 	content = request.json
@@ -19,36 +25,42 @@ def get_rules():
 	hostname = hostname.lower()
 	rules = content['rules']
 	if not os.path.exists("/tmp/flask_files"):
-		os.makedirs("/tmp/flask_files")	
+		os.makedirs("/tmp/flask_files")		#make dir in /tmp	
 	dir_str = "/tmp/flask_files/" + hostname + ".txt"
 	with open(dir_str, "w+") as f:
 		header_str = "Hostname: " + hostname
 		t = datetime.datetime.now()
 		t_str = "Updated at: " + str(t)
-		f.write(header_str)
+		f.write(header_str)		#write hostname/times/padding
 		f.write("\n")
 		f.write(t_str)
 		f.write("\n\n\n")
-		f.write(rules)
+		f.write(rules)			#write firewall rules
 	return str(content)
 
 
+"""
+This function takes the hostname from the url and outputs 
+that host's iptables as well as a timestamp of when the 
+data was last updated
+"""
 @app.route('/api/hosts/<host>')
 def view_rules(host):
 	try:
 		dir_str = "/tmp/flask_files/" + host + ".txt"
 		with open(dir_str, "r") as f:
-			data = f.readlines()
+			data = f.readlines()	#read rules into string
 	except:
 		err = "No data on host: " + host
-		return err
+		return err					#err if no matching file
 
 	fin = "<p>"
-	for line in data:
+	for line in data:			#string -> html
 		fin += line + "<br />"
 	fin += "</p>"
-	return fin
+	return fin					#return html block
 
 
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0')
+
