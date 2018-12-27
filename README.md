@@ -3,7 +3,7 @@ Client binary will gather iptable information and send it to a web server via PO
 
 ### Config:
 In the "campfire.go" file, lines 18 and 19 contain the variables that must be changed  
-`var serv = "127.0.0.1:5000"`
+`var serv = "127.0.0.1:5000"`  
 `var loop_time = 60`  
 The "serv" variable contains the IP/port of the flask server, and the "loop_time" variable is an integer dictating how often the binary will post data back to the server.    
 Once these variables are updated, the code can be compiled into a binary which can be dropped on to the hosts.
