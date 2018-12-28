@@ -9,6 +9,9 @@ import re
 
 server = "127.0.0.1:5000"		#IP of flask server
 
+"""
+query API and return string of all tracked hosts
+"""
 def list_hosts(srv):
 	endpoint = "http://" + srv + "/hosts/"
 	r = requests.get(endpoint)
@@ -27,7 +30,9 @@ def list_hosts(srv):
 		hstr += item + "\n"	
 	return hstr
 
-
+"""
+query api, return firewall config of host
+"""
 def get_host(srv, host):
 	endpoint = "http://" + srv + "/api/hosts/" + host
 	r = requests.get(endpoint)
@@ -44,13 +49,20 @@ def get_host(srv, host):
 		a += line
 	return a
 
+"""
+Display help/syntax message to user
+"""
 def help_msg():
 	s = """	'help': print help message
 	'hosts':list tracked hosts
-	'show X'show IP tables for hostname X
+	'show X': show IP tables for hostname X
 	'exit': close the program"""	
 	return s	
 
+
+"""
+Prase/process user input
+"""
 def inp_loop(srv):
 	inp = input("Tracker> ")
 	if inp == "help":
@@ -73,10 +85,12 @@ def inp_loop(srv):
 	
 	print(st)	
 		
-
+"""
+Run it all
+"""
+print("Welcome to the Campfire Tracker!")
+print(help_msg())
 while True:
 	inp_loop(server)
-
-
 
 
