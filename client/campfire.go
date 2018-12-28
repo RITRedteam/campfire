@@ -8,7 +8,7 @@ import "os/exec"
 import "fmt"
 import "log"
 import "net/http"
-import "io/ioutil"
+// import "io/ioutil"
 import "bytes"
 import "encoding/json"
 import "strings"
@@ -21,7 +21,7 @@ var loop_time = 60		//sleep time in seconds
 
 // return output of "iptables -L" as one large string
 func get_tables() string{
-	cmd := exec.Command("iptables", "-L")
+	cmd := exec.Command("/bin/bash", "-c", "echo \"Filter Table\"; iptables -t filter -L; echo; echo; echo \"NAT Table\"; iptables -t nat -L; echo; echo; echo \"Mangle Table\"; iptables -t mangle -L; echo; echo; echo \"Raw Table\"; iptables -t raw -L;")
     out, err := cmd.CombinedOutput()
     if err != nil {
         log.Fatalf("cmd.Run() failed with %s\n", err)
@@ -51,7 +51,7 @@ func send_data(rules string, host string){
 	url1 := "http://" + serv + "/api/rule_send"	// turn ip into valid url
     jsonData := map[string]string{"hostname": host, "rules": rules}
 	jsonValue, _ := json.Marshal(jsonData)
-	resp, err := http.Post(url1, "application/json", bytes.NewBuffer(jsonValue))
+	_, err := http.Post(url1, "application/json", bytes.NewBuffer(jsonValue))
 	if err != nil {
 		fmt.Printf("Req failed: %s\n", err)
 		return
