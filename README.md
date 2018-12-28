@@ -22,7 +22,10 @@ once the build is finished, it can be run with the following:
 The flask server is now accessible via port 5000  
 
 ###### Navigation
-Once the server is running, the hosts will be able to send their post requests to "_IP_:5000/api/rule_send" which can then be viewed by going to the associated host URL.  For hostname "test1" the url would be ""_IP_:5000/api/hosts/test1" or users can navigate to "_IP_:5000/hosts/" and they will have a list of all tracked targets.  
+Once the server is running, the hosts will be able to send their post requests to "_IP_:5000/api/rule_send" which can then be viewed by going to the associated host URL.  For hostname "test1" the url would be ""_IP_:5000/api/hosts/test1" or users can navigate to "_IP_:5000/hosts/" and they will have a list of all tracked targets. 
 
-#### TODO
-* Write a script to query API so we can get a host's rules without navigating through the web browser   
+###### Tracker
+As an alternative to using a web browser to manually navigate the pages, users can run the "tracker.py" script, which offers a CLI to list tracked hosts and view firewall information of a specific host.  The only configuration needed for "tracker.py" is to install the requirements(the requests library), and to replace the "server" variable on line 10 with the IP address of your campfire flask server.  
+`server = "127.0.0.1:5000"`  
+ 
+
