@@ -23,18 +23,19 @@ def get_rules():
 	print content
 	hostname = content['hostname']
 	hostname = hostname.lower()
+        ip = content['ip']
 	rules = content['rules']
 	if not os.path.isfile("/tmp/host_list.txt"):
 		with open("/tmp/host_list.txt", "w+") as f:
-			f.write(hostname + "\n")
+			f.write(ip + "\n")
 	else:
 		with open("/tmp/host_list.txt", "a") as f:
-			f.write(hostname + "\n")
+			f.write(ip + "\n")
 	if not os.path.exists("/tmp/flask_files"):
 		os.makedirs("/tmp/flask_files")		#make dir in /tmp	
-	dir_str = "/tmp/flask_files/" + hostname + ".txt"
+	dir_str = "/tmp/flask_files/" + ip + ".txt"
 	with open(dir_str, "w+") as f:
-		header_str = "Hostname: " + hostname
+            header_str = "IP: " + ip + "\nHostname: " + hostname 
 		t = datetime.datetime.now()
 		t_str = "Updated at: " + str(t)
 		f.write(header_str)		#write hostname/times/padding
