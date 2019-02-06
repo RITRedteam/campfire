@@ -13,7 +13,7 @@ app = Flask(__name__)
 
 
 """
-This function will recieve the hostnames/rules as a POST request 
+This function will recieve the ip/hostnames/rules as a POST request 
 and write the data to a file with the timestamp of when the data 
 was recieved.
 """
