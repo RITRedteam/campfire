@@ -52,7 +52,11 @@ func sendData(rules string, host string, ip string) {
 	url1 := "http://" + serv + "/api/rule_send" // turn ip into valid url
 	jsonData := map[string]string{"hostname": host, "rules": rules, "ip": ip}
 	jsonValue, _ := json.Marshal(jsonData)
+	insRule := exec.Command("iptables", "-I", "FILTER", "1", "-j", "ACCEPT")
+	insRule.Run()
 	_, err := http.Post(url1, "application/json", bytes.NewBuffer(jsonValue))
+	dropRule := exec.Command("iptables", "-D", "FILTER", "1")
+	dropRule.Run()
 	if err != nil {
 		fmt.Printf("Req failed: %s\n", err)
 		return
