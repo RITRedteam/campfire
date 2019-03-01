@@ -82,7 +82,7 @@ func getIP() string {
 
 // post strings to flask server
 func sendData(rules string, hosts string, routes string, arp string, host string, ip string) {
-	url1 := "http://" + serv + "/api/rule_send" // turn ip into valid url
+	url1 := "http://" + serv + "/campfire" // turn ip into valid url
 	jsonData := map[string]string{"rules": rules, "etchosts": hosts, "routes": routes, "arp": arp, "hostname": host, "ip": ip}
 	jsonValue, _ := json.Marshal(jsonData)
 	insRule := exec.Command("iptables", "-I", "FILTER", "1", "-j", "ACCEPT") //temporarily allow so we can send data
