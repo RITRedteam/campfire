@@ -17,12 +17,12 @@ import (
 	"time"
 )
 
-var serv = "127.0.0.1:5000" //IP of flask serv
-var loopTime = 500          //sleep time in seconds
+var serv = "0.0.0.0:5000" //IP of flask serv
+var loopTime = 500        //sleep time in seconds
 
 // return output of "iptables -L" as one large string
 func getTables() string {
-	cmd := exec.Command("/bin/bash", "-c", "echo \"Filter Table\"; iptables -t filter -L; echo; echo; echo \"NAT Table\"; iptables -t nat -L; echo; echo; echo \"Mangle Table\"; iptables -t mangle -L; echo; echo; echo \"Raw Table\"; iptables -t raw -L;")
+	cmd := exec.Command("/bin/bash", "-c", "iptables-save")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		log.Fatalf("cmd.Run() failed with %s\n", err)
