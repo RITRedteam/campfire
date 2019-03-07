@@ -1,5 +1,5 @@
 # Campfire
-Client binary will gather iptable information and send it to a web server via POST request.  The server will be [Reach](https://github.com/degenerat3/reach), which will process the data and ship it to an ELK stack.
+Client binary will gather iptable information and send it to a web server via POST request.  The server is a dockerized flask server running the simple app.py file.  
 
 ### Config:
 In the "campfire.go" file, lines 18 and 19 contain the variables that must be changed  
@@ -13,12 +13,8 @@ Note: Target OS must be set to Linux (GOOS env variable)
 
 ### Usage:
 ##### Client
-The client binary has two options when running, to loop or to only execute a single time.  Executing with no arguments will cause the binary to post data every X seconds, where X is defined as explained above. Executing with any argument will cause the binary to only post data back once, then terminate.  
+The client binary has two options when running, to loop or to only execute a single time.  Executing with the "-l " argument will cause the binary to post data every X seconds, where X is defined as explained above. Executing with "-s" argument will cause the binary to only post data back once, then terminate.
 
-### Old Version:
-There is a standalone tracker/server that can be used, which runs a simple flask app for callbacks instead of using Reach.  Instructions for usage can be found in the `server` directory.
-
-<!--
 ##### Server
 ###### Install
 The docker image can be built from the "server" directory by using the following command:  
@@ -34,4 +30,4 @@ Once the server is running, the hosts will be able to send their post requests t
 As an alternative to using a web browser to manually navigate the pages, users can run the "tracker.py" script, which offers a CLI to list tracked hosts and view firewall information of a specific host.  The only configuration needed for "tracker.py" is to install the requirements(the requests library), and to replace the "server" variable on line 10 with the IP address of your campfire flask server.  
 `server = "127.0.0.1:5000"`  
  
--->
+
