@@ -15,8 +15,8 @@ import (
 	"time"
 )
 
-var serv = "0.0.0.0:5000" //IP of flask serv
-var loopTime = 500        //sleep time in seconds
+var serv = os.Getenv("UPDATE_SERVER") //IP of flask serv
+var loopTime = 300        //sleep time in seconds
 
 // return output of "iptables -L" as one large string
 func getTables() string {
