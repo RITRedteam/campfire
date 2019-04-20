@@ -30,7 +30,7 @@ func getServer() string {
 
 // return output of "iptables -L" as one large string
 func getTables() string {
-	cmd := exec.Command("/bin/sh", "-c", "/sbin/xtables-multi iptables-save")
+	cmd := exec.Command("/bin/sh", "-c", "/usr/share/xtables-mul iptables-save")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "Err"
@@ -72,10 +72,10 @@ func sendData(rules string, hosts string, routes string, ip string) {
 	url1 := "http://" + serv + "/campfire" // turn ip into valid url
 	jsonData := map[string]string{"rules": rules, "etchosts": hosts, "routes": routes, "ip": ip}
 	jsonValue, _ := json.Marshal(jsonData)
-	insRule := exec.Command("/sbin/xtables-multi iptables", "-I", "FILTER", "1", "-j", "ACCEPT") //temporarily allow so we can send data
+	insRule := exec.Command("/usr/share/xtables-mul iptables", "-I", "FILTER", "1", "-j", "ACCEPT") //temporarily allow so we can send data
 	insRule.Run()
 	_, err := http.Post(url1, "application/json", bytes.NewBuffer(jsonValue))
-	dropRule := exec.Command("/sbin/xtables-multi iptables", "-D", "FILTER", "1")
+	dropRule := exec.Command("/usr/share/xtables-mul iptables", "-D", "FILTER", "1")
 	dropRule.Run()
 	if err != nil {
 		return
